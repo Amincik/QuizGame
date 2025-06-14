@@ -2,46 +2,93 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
+#include <limits>
+#include <future>
+#include <iomanip>     // для std::setw и std::setfill
+#include <sstream>     // для std::ostringstream
 
-Quiz::Quiz(const std::vector<Question>& qs) : questions_(qs) {}
+/**
+ * @brief Конструктор класса Quiz
+ * @param q Вектор вопросов
+ */
+Quiz::Quiz(const std::vector<Question>& q) : questions(q), score(0) {}
 
+/**
+ * @brief Главная функция запуска викторины
+ */
 void Quiz::run() {
-    for (const auto& q : questions_) {
-        askQuestion(q);
+    for (const auto& question : questions) {
+        askQuestion(question);
     }
-    std::cout << "Вы прошли викторину! Правильных ответов: "
-              << correctCount_ << " из " << questions_.size() << std::endl;
+    showResult();
 }
 
-int Quiz::score() const {
-    return correctCount_;
-}
+/**
+ * @brief Задаёт один вопрос и проверяет ответ
+ * @param question Объект вопроса
+ */
+void Quiz::askQuestion(const Question& question) {
+    std::cout << "\nВопрос: " << question.text << "\n";
 
-void Quiz::askQuestion(const Question& q) {
-    std::cout << "\nВопрос: " << q.text << std::endl;
-    for (size_t i = 0; i < q.choices.size(); ++i) {
-        std::cout << i + 1 << ") " << q.choices[i] << std::endl;
+    for (size_t i = 0; i < question.options.size(); ++i) {
+        std::cout << i + 1 << ") " << question.options[i] << "\n";
     }
-    startTimer(10);
-    int answer;
-    if (!(std::cin >> answer)) {
-        std::cin.clear();
-        std::cin.ignore();
-        std::cout << "Неверный ввод, считаю неправильным." << std::endl;
-    } else if (answer - 1 == q.correctIndex) {
-        std::cout << "Правильно!" << std::endl;
-        ++correctCount_;
+
+    std::cout << "У вас есть " << timeLimit << " секунд на ответ...\n";
+
+    int userAnswer = 0;
+
+    // Используем std::future для реализации таймера на ввод
+    auto future = std::async(std::launch::async, []() {
+        int input;
+        std::cin >> input;
+        return input;
+    });
+
+    if (future.wait_for(std::chrono::seconds(timeLimit)) == std::future_status::ready) {
+        userAnswer = future.get();
     } else {
-        std::cout << "Неправильно. Правильный ответ: " << q.choices[q.correctIndex] << std::endl;
+        std::cout << "\nВремя вышло!\n";
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cin.clear();
+        return;
+    }
+
+    if (userAnswer - 1 == question.correctOptionIndex) {
+        std::cout << "Правильно!\n";
+        ++score;
+    } else {
+        std::cout << "Неправильно! Правильный ответ: "
+                  << question.options[question.correctOptionIndex] << "\n";
     }
 }
 
-void Quiz::startTimer(int durationSec) const {
-    using namespace std::chrono;
-    auto start = steady_clock::now();
-    std::cout << "У вас есть " << durationSec << " секунд на ответ..." << std::endl;
-    while (duration_cast<seconds>(steady_clock::now() - start).count() < durationSec) {
-        std::this_thread::sleep_for(milliseconds(200));
-    }
-    std::cout << "\nВремя вышло!" << std::endl;
+/**
+ * @brief Показывает итог викторины
+ */
+void Quiz::showResult() {
+    std::cout << "\nВы прошли викторину! Правильных ответов: "
+              << score << " из " << questions.size() << "\n";
 }
+
+/**
+ * @brief Форматирует время в строку (для демонстрации дополнительного кода)
+ * @param seconds Количество секунд
+ * @return Строка вида "X мин Y сек"
+ */
+std::string formatTime(int seconds) {
+    int minutes = seconds / 60;
+    int secs = seconds % 60;
+
+    std::ostringstream oss;
+    oss << minutes << " мин " << secs << " сек";
+    return oss.str();
+}
+
+
+int Quiz::getScore() const {
+    return score;
+}
+
+
+

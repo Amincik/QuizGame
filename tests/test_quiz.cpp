@@ -1,27 +1,30 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include "../external/doctest/doctest.h"
-#include "../include/Quiz.h"
+#include "doctest.h"
+#include "Quiz.h"
 
-TEST_CASE("Question struct basic") {
-    Question q{"T?", {"A","B","C"}, 0};
-    CHECK(q.text == "T?");
-    CHECK(q.choices.size() == 3);
-    CHECK(q.correctIndex == 0);
+TEST_CASE("Тест структуры Question") {
+    Question q;
+    q.text = "Сколько будет 2 + 2?";
+    q.options = {"3", "4", "5"};
+    q.correctOptionIndex = 1;
+
+    CHECK(q.text == "Сколько будет 2 + 2?");
+    CHECK(q.options.size() == 3);
+    CHECK(q.correctOptionIndex == 1);
 }
 
-TEST_CASE("Quiz scoring positive") {
-    std::vector<Question> qs = {
-        {"1+1", {"2"}, 0}
+TEST_CASE("Тест конструктора Quiz") {
+    std::vector<Question> questions = {
+        {"Столица России?", {"Москва", "Киев", "Минск", "Астана"}, 0},
+        {"Сколько дней в неделе?", {"5", "6", "7"}, 2}
     };
-    Quiz quiz(qs);
-    CHECK(quiz.score() == 0);
+
+    Quiz quiz(questions);
+    CHECK(quiz.getScore() == 0);
 }
 
-TEST_CASE("Quiz askQuestion negative skip") {
-    std::vector<Question> qs = {
-        {"Q", {"X","Y"}, 1}
-    };
-    Quiz quiz(qs);
-    // Здесь бы замокать ввод — сложнее, но проверяем score не падает
-    CHECK(quiz.score() == 0);
+TEST_CASE("Тест времени форматирования") {
+    CHECK(formatTime(0) == "0 мин 0 сек");
+    CHECK(formatTime(65) == "1 мин 5 сек");
+    CHECK(formatTime(125) == "2 мин 5 сек");
 }

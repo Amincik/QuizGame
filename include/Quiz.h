@@ -4,38 +4,59 @@
 #include <string>
 #include <vector>
 
-/// \brief Структура одного вопроса викторины
+/**
+ * @brief Структура одного вопроса викторины
+ */
 struct Question {
-    std::string text;                  ///< Текст вопроса
-    std::vector<std::string> choices; ///< Варианты ответов
-    int correctIndex;                 ///< Индекс правильного варианта
+    std::string text;                    ///< Текст вопроса
+    std::vector<std::string> options;   ///< Варианты ответов
+    int correctOptionIndex;             ///< Индекс правильного варианта (с 0)
 };
 
-/// \brief Основной класс викторины
+/**
+ * @brief Основной класс викторины
+ */
 class Quiz {
 public:
-    /// \brief Конструктор викторины
-    /// \param qs Список вопросов
+    /**
+     * @brief Конструктор викторины
+     * @param qs Список вопросов
+     */
     Quiz(const std::vector<Question>& qs);
 
-    /// \brief Запускает викторину (вопросы с таймером)
+    /**
+     * @brief Запускает викторину
+     */
     void run();
 
-    /// \brief Получает количество правильных ответов
-    /// \return Число правильных ответов
-    int score() const;
+    /**
+     * @brief Получает количество правильных ответов
+     * @return Число правильных ответов
+     */
+    int getScore() const;
 
 private:
-    std::vector<Question> questions_; ///< Вопросы викторины
-    int correctCount_ = 0;            ///< Счётчик правильных ответов
+    std::vector<Question> questions;  ///< Список вопросов
+    int score = 0;                    ///< Счётчик правильных ответов
+    const int timeLimit = 10;        ///< Ограничение времени на ответ (сек)
 
-    /// \brief Задаёт один вопрос, показывает варианты, ждёт ответ
-    /// \param q Вопрос
-    void askQuestion(const Question& q);
+    /**
+     * @brief Обрабатывает один вопрос, выводит и ждёт ответ
+     * @param question Вопрос
+     */
+    void askQuestion(const Question& question);
 
-    /// \brief Таймер ожидания (вшеллл)
-    /// \param durationSec Время ожидания в секундах
-    void startTimer(int durationSec) const;
+    /**
+     * @brief Показывает итог викторины
+     */
+    void showResult();
 };
+
+/**
+ * @brief Форматирует время в строку вида "X мин Y сек"
+ * @param seconds Количество секунд
+ * @return Отформатированная строка
+ */
+std::string formatTime(int seconds);
 
 #endif // QUIZ_H
