@@ -1,8 +1,10 @@
 build/
 *.exe
-*.obj
 *.o
+*.obj
+*.out
 *.log
-*.user
-*.swp
-.DS_Store
+CMakeFiles/
+CMakeCache.txt
+Makefile
+cmake_install.cmake
