@@ -19,7 +19,7 @@ TEST_CASE("Тест конструктора Quiz") {
         {"Сколько дней в неделе?", {"5", "6", "7"}, 2}
     };
 
-    Quiz quiz(questions);
+    Quiz quiz(questions, Difficulty::Easy); // или нужный уровень сложности
     CHECK(quiz.getScore() == 0);
 }
 

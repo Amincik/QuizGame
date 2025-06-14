@@ -4,14 +4,29 @@
 #include <thread>
 #include <limits>
 #include <future>
-#include <iomanip>     // для std::setw и std::setfill
-#include <sstream>     // для std::ostringstream
+#include <sstream>
 
 /**
  * @brief Конструктор класса Quiz
  * @param q Вектор вопросов
+ * @param diff Уровень сложности викторины
  */
-Quiz::Quiz(const std::vector<Question>& q) : questions(q), score(0) {}
+Quiz::Quiz(const std::vector<Question>& q, Difficulty diff)
+    : questions(q), score(0), quizDifficulty(diff) 
+{
+    // Устанавливаем время на ответ в зависимости от сложности
+    switch (quizDifficulty) {
+        case Difficulty::Easy:
+            timeLimit = 15;
+            break;
+        case Difficulty::Medium:
+            timeLimit = 10;
+            break;
+        case Difficulty::Hard:
+            timeLimit = 7;
+            break;
+    }
+}
 
 /**
  * @brief Главная функция запуска викторины
@@ -56,7 +71,19 @@ void Quiz::askQuestion(const Question& question) {
 
     if (userAnswer - 1 == question.correctOptionIndex) {
         std::cout << "Правильно!\n";
-        ++score;
+
+        // Начисляем очки в зависимости от сложности вопроса
+        switch (question.difficulty) {
+            case Difficulty::Easy:
+                score += 1;
+                break;
+            case Difficulty::Medium:
+                score += 2;
+                break;
+            case Difficulty::Hard:
+                score += 3;
+                break;
+        }
     } else {
         std::cout << "Неправильно! Правильный ответ: "
                   << question.options[question.correctOptionIndex] << "\n";
@@ -67,8 +94,8 @@ void Quiz::askQuestion(const Question& question) {
  * @brief Показывает итог викторины
  */
 void Quiz::showResult() {
-    std::cout << "\nВы прошли викторину! Правильных ответов: "
-              << score << " из " << questions.size() << "\n";
+    std::cout << "\nВы прошли викторину! Ваши очки: "
+              << score << " из максимальных возможных.\n";
 }
 
 /**
@@ -85,10 +112,6 @@ std::string formatTime(int seconds) {
     return oss.str();
 }
 
-
 int Quiz::getScore() const {
     return score;
 }
-
-
-

@@ -11,8 +11,8 @@ add_library(Quiz STATIC src/Quiz.cpp)
 add_executable(quiz_app src/main.cpp)
 target_link_libraries(quiz_app PRIVATE Quiz)
 
-include_directories(external/doctest)
 add_executable(test_quiz tests/test_quiz.cpp)
+target_include_directories(test_quiz PRIVATE ${CMAKE_SOURCE_DIR}/external/doctest)
 target_link_libraries(test_quiz PRIVATE Quiz)
 
 enable_testing()

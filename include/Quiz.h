@@ -5,12 +5,22 @@
 #include <vector>
 
 /**
+ * @brief Уровень сложности вопроса
+ */
+enum class Difficulty {
+    Easy,
+    Medium,
+    Hard
+};
+
+/**
  * @brief Структура одного вопроса викторины
  */
 struct Question {
     std::string text;                    ///< Текст вопроса
     std::vector<std::string> options;   ///< Варианты ответов
-    int correctOptionIndex;             ///< Индекс правильного варианта (с 0)
+    int correctOptionIndex;              ///< Индекс правильного варианта (с 0)
+    Difficulty difficulty;               ///< Уровень сложности вопроса
 };
 
 /**
@@ -21,8 +31,9 @@ public:
     /**
      * @brief Конструктор викторины
      * @param qs Список вопросов
+     * @param diff Уровень сложности викторины
      */
-    Quiz(const std::vector<Question>& qs);
+    Quiz(const std::vector<Question>& qs, Difficulty diff);
 
     /**
      * @brief Запускает викторину
@@ -30,15 +41,18 @@ public:
     void run();
 
     /**
-     * @brief Получает количество правильных ответов
-     * @return Число правильных ответов
+     * @brief Получает количество набранных очков
+     * @return Количество очков
      */
     int getScore() const;
 
 private:
     std::vector<Question> questions;  ///< Список вопросов
-    int score = 0;                    ///< Счётчик правильных ответов
-    const int timeLimit = 10;        ///< Ограничение времени на ответ (сек)
+    int score = 0;                    ///< Счётчик очков
+    int currentQuestionIndex = 0;     ///< Текущий вопрос
+    int timeLimit = 10;               ///< Время на ответ (сек)
+
+    Difficulty quizDifficulty;        ///< Выбранный уровень сложности викторины
 
     /**
      * @brief Обрабатывает один вопрос, выводит и ждёт ответ
